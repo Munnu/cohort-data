@@ -35,15 +35,27 @@ def sort_by_cohort(filename):
         ex. all_students = [winter_15, spring_15, summer_15, tas]
 
     """
-
+    cohort_file = open(filename)
     all_students = []
     winter_15 = []
     spring_15 = []
     summer_15 = []
     tas = []
-
-    # Code goes here
-
+    for line in cohort_file:
+        new_line = line.split("|")
+        if new_line[-1] == "Winter 2015\n":
+            winter_15.append(new_line[:2])
+        elif new_line[-1] == "Spring 2015\n":
+            spring_15.append(new_line[:2])
+        elif new_line[-1] == "Summer 2015\n":
+            summer_15.append(new_line[:2])
+        elif new_line[-1] == "TA\n":
+            tas.append(new_line[:2])
+    all_students.append(winter_15)
+    all_students.append(spring_15)
+    all_students.append(summer_15)
+    all_students.append(tas)
+    cohort_file.close()
     return all_students
 
 
