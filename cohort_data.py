@@ -16,8 +16,8 @@ def unique_houses(filename):
     cohort_file = open(filename)
     houses = set()  #create empty set
     for line in cohort_file:
-        line.rstrip()  #strip the \n
-        new_line = line.split("|") 
+        new_line = line.strip("\n")
+        new_line = new_line.split("|")
         if new_line[2] != "":  # as long as it's not empty
             houses.add(new_line[2])  #add to houses set 
 
@@ -42,14 +42,15 @@ def sort_by_cohort(filename):
     summer_15 = []
     tas = []
     for line in cohort_file:
+        new_line = line.strip("\n")
         new_line = line.split("|")
-        if new_line[-1] == "Winter 2015\n":
+        if new_line[-1] == "Winter 2015":
             winter_15.append(new_line[:2])
-        elif new_line[-1] == "Spring 2015\n":
+        elif new_line[-1] == "Spring 2015":
             spring_15.append(new_line[:2])
-        elif new_line[-1] == "Summer 2015\n":
+        elif new_line[-1] == "Summer 2015":
             summer_15.append(new_line[:2])
-        elif new_line[-1] == "TA\n":
+        elif new_line[-1] == "TA":
             tas.append(new_line[:2])
     all_students.append(winter_15)
     all_students.append(spring_15)
@@ -79,6 +80,7 @@ def students_by_house(filename):
             ]
     """
 
+    cohort_file = open(filename)
     all_students = []
     gryffindor = []
     hufflepuff = []
@@ -89,10 +91,36 @@ def students_by_house(filename):
     tas = []
     instructors = []
 
-    # Code goes here
+    for line in cohort_file:
+        new_line = line.strip("\n")
+        new_line = new_line.split("|")
+        if new_line[1] == "Gryffindor":
+            gryffindor.append(new_line[1])
+        elif new_line[1] == "Hufflepuff":
+            hufflepuff.append(new_line[1])
+        elif new_line[1] == "Slytherin":
+            hufflepuff.append(new_line[1])
+        elif new_line[1] == "Dumbledore's Army":
+            dumbledores_army.append(new_line[1])
+        elif new_line[1] == "Order of the Phoenix":
+            order_of_the_phoenix.append(new_line[1])
+        elif new_line[1] == "Ravenclaw":
+            ravenclaw.append(new_line[1])
+        elif new_line[-1] == "TA":
+            tas.append(new_line[1])
+        elif new_line[-1] == "I":
+            instructors.append(new_line[1])
+    all_students.append(gryffindor)
+    all_students.append(hufflepuff)
+    all_students.append(slytherin)
+    all_students.append(dumbledores_army)
+    all_students.append(order_of_the_phoenix)
+    all_students.append(ravenclaw)
+    all_students.append(tas)
+    all_students.append(instructors)
 
+    cohort_file.close()
     return all_students
-
 
 def all_students_tuple_list(filename):
     """TODO: Create a list of tuples of student data.
@@ -107,9 +135,15 @@ def all_students_tuple_list(filename):
     """
 
     student_list = []
-
-    # Code goes here
-
+    cohort_file = open(filename)
+    for line in cohort_file:
+        new_line = line.strip("\n")
+        new_line = new_line.split("|")
+        if (new_line[-1] != 'TA') and (new_line[-1] != 'I'):
+            first_last_name = new_line[0] + ' ' + new_line[1]
+            del new_line[0]
+            new_line[0] = first_last_name
+            student_list.append(tuple(new_line))
     return student_list
 
 
@@ -120,8 +154,11 @@ def find_cohort_by_student_name(student_list):
     function that, given a first and last name, returns that student's cohort, or returns
     'Student not found.' when appropriate. """
 
-    # Code goes here
-
+    user_input = raw_input("Enter a Hackbright student's first and last name ")
+    user_input.rstrip()
+    for student_data in student_list:
+        if user_input in student_data:
+            return student_data
     return "Student not found."
 
 
@@ -141,9 +178,21 @@ def find_name_duplicates(filename):
     """
 
     duplicate_names = set()
+    winter_15 = set()
+    spring_15 = set()
+    summer_15 = set()
 
-    # Code goes here
-
+    cohort_data = open(filename)
+    for line in cohort_data:
+        line.strip("\n")
+        line = line.split("|")
+        if 'Winter' in line[-1]: 
+          winter_15.add(line[0])
+        elif 'Spring' in line[-1]:
+          spring_15.add(line[0])
+        elif 'Summer' in line[-1]:
+          summer_15.add(line[0])
+    duplicate_names = winter_15 & spring_15 & summer_15
     return duplicate_names
 
 
@@ -156,19 +205,35 @@ def find_house_members_by_student_name(student_list):
     that student's cohort and that student's house."""
 
     # Code goes here
+    student_input = raw_input("Input a Hackbright student name: first and last ")
+    students_in_the_same_house = []
+    student_house_name = ''
+    student_cohort_time = ''
+    for student_data in student_list: 
+        # Loop through the list to get tuples
+        if student_input in student_data:
+            student_house_name = student_data[1]
+            student_cohort_time = student_data[-1]
 
-    return
+    for student_data in student_list:
+        if student_house_name != '' and student_cohort_time != '':
+          if (student_house_name in student_data) and \
+              (student_cohort_time in student_data):
+            students_in_the_same_house.append((student_data[0], \
+                student_data[1], student_data[-1]))
+
+    return students_in_the_same_house
 
 
 #########################################################################################
 
 # Here is some useful code to run these functions!
 
-# print unique_houses("cohort_data.txt")
-# print sort_by_cohort("cohort_data.txt")
-# print students_by_house("cohort_data.txt")
-# all_students_data = all_students_tuple_list("cohort_data.txt")
-# print all_students_data
-# find_cohort_by_student_name(all_students_data)
-# print find_name_duplicates("cohort_data.txt")
-# find_house_members_by_student_name(all_students_data)
+print unique_houses("cohort_data.txt")
+print sort_by_cohort("cohort_data.txt")
+students_by_house("cohort_data.txt")
+all_students_data = all_students_tuple_list("cohort_data.txt")
+print all_students_data
+find_cohort_by_student_name(all_students_data)
+print find_name_duplicates("cohort_data.txt")
+find_house_members_by_student_name(all_students_data)
